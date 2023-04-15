@@ -6,11 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,41 +28,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CourseApp()
-        }
-        }
-    }
-}
-
-
-@Composable
-fun CourseApp() {
-    CoursesTheme() {
-    }
-}
-
-
-
-
-@Composable
-fun TopicCard(topicGrid: Topic, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.padding(8.dp), elevation = 4.dp) {
-        Column() {
-            Image(
-                painter = painterResource(topicGrid.stringResourceId),
-                contentDescription = stringResource(topicGrid.stringResourceId),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(194.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            Text(
-                text = stringResource(topicGrid.stringResourceId),
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.h6
-            )
-
+            TopicGrid()
         }
     }
 }
@@ -65,18 +36,75 @@ fun TopicCard(topicGrid: Topic, modifier: Modifier = Modifier) {
 
 
 @Composable
-private fun TopicList(topicList: List<Topic>, modifier: Modifier = Modifier) {
-    LazyColumn {
-        items(DataSource.topics){ topic ->
+fun TopicGrid(modifier: Modifier = Modifier) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.padding(8.dp)
+    ) {
+        items(DataSource.topics) { topic ->
             TopicCard(topic)
         }
     }
 }
 
-
-@Preview
 @Composable
-private fun TopicCardPreview() {
-    TopicCard(Topic(R.string.architecture, R.drawable.architecture, R.drawable.architecture))
+fun TopicCard(topic: Topic, modifier: Modifier = Modifier) {
+    Card(elevation = 4.dp) {
+        Row {
+            Box {
+                Image(
+                    painter = painterResource(id = topic.imageRes),
+                    contentDescription = null,
+                    modifier = modifier
+                        .size(width = 68.dp, height = 68.dp)
+                        .aspectRatio(1f),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Column {
+                Text(
+                    text = stringResource(id = topic.name),
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 16.dp,
+                        end = 16.dp,
+                        bottom = 8.dp
+                    )
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_grain),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                    )
+                    Text(
+                        text = topic.availableCourses.toString(),
+                        style = MaterialTheme.typography.caption,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopicPreview() {
+    CoursesTheme {
+        val topic = Topic(R.string.photography, 321, R.drawable.photography)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TopicCard(topic = topic)
+        }
+    }
 }
 
